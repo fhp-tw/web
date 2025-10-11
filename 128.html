@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>長頸鹿美語語詞大挑戰 Action Book 6</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the game */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background-color: #ffffff; /* White card background */
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-header {
+            color: #2c3e50; /* Dark blue-gray text */
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Home Screen Styles */
+        .home-screen {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            justify-items: center;
+            align-items: center;
+        }
+        @media (max-width: 640px) {
+            .home-screen {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+        .lesson-button {
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: #6a5acd; /* Medium purple */
+            color: white;
+            border: none;
+            width: 80%; /* Make buttons wider */
+            max-width: 300px;
+        }
+        .lesson-button:hover {
+            background-color: #483d8b; /* Darker purple on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Game Screen Styles */
+        .game-screen {
+            display: none; /* Hidden by default, shown when game starts */
+            flex-direction: column;
+            gap: 20px;
+        }
+        .question-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .question-box {
+            background-color: #e3f2fd; /* Lighter blue for question area */
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .question-prompt {
+            font-size: 1.5rem; /* text-2xl */
+            color: #34495e; /* Medium dark text */
+            font-weight: 500;
+        }
+        .example-container {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the content */
+            gap: 10px; /* Space between sentence and button */
+        }
+        .example-sentence-english {
+            font-size: 1.125rem; /* text-lg */
+            color: #555;
+            font-style: italic;
+        }
+        .example-sentence-chinese {
+            font-size: 1rem; /* text-base */
+            color: #777;
+            margin-top: 5px; /* Space between English and Chinese */
+        }
+        .inline-speak-button {
+            background-color: #f39c12; /* Orange background for "重聽" button */
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 15px; /* Adjust padding for text */
+            border-radius: 10px;
+            font-size: 0.9rem; /* Adjust font size for the button text */
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .inline-speak-button:hover {
+            background-color: #e67e22; /* Darker orange on hover */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .answer-input {
+            padding: 12px 20px;
+            border: 2px solid #a7d9f7; /* Light blue border */
+            border-radius: 10px;
+            font-size: 1.125rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        .answer-input:focus {
+            outline: none;
+            border-color: #4a90e2; /* Brighter blue on focus */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .game-button {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-button.primary {
+            background-color: #4a90e2; /* Blue */
+            color: white;
+            border: none;
+        }
+        .game-button.primary:hover {
+            background-color: #357ABD;
+        }
+
+        .game-button.secondary {
+            background-color: #f39c12; /* Orange */
+            color: white;
+            border: none;
+        }
+        .game-button.secondary:hover {
+            background-color: #e67e22;
+        }
+
+        .game-button.tertiary {
+            background-color: #2ecc71; /* Green */
+            color: white;
+            border: none;
+        }
+        .game-button.tertiary:hover {
+            background-color: #27ae60;
+        }
+        .game-button.danger {
+            background-color: #e74c3c; /* Red */
+            color: white;
+            border: none;
+        }
+        .game-button.danger:hover {
+            background-color: #c0392b;
+        }
+
+        .score-display {
+            font-size: 1.25rem; /* text-xl */
+            color: #2980b9; /* Darker blue */
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .message-box {
+            background-color: #ffe0b2; /* Light orange for messages */
+            color: #e65100; /* Dark orange text */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: none; /* Hidden by default */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .message-box.correct {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green */
+        }
+        .message-box.incorrect {
+            background-color: #f8d7da; /* Light red */
+            color: #721c24; /* Dark red */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .game-header {
+                font-size: 1.75rem; /* text-3xl */
+            }
+            .question-prompt {
+                font-size: 1.25rem; /* text-xl */
+            }
+            .example-sentence-english {
+                font-size: 1rem; /* text-base */
+            }
+            .example-sentence-chinese {
+                font-size: 0.9rem;
+            }
+            .answer-input, .game-button {
+                font-size: 1rem;
+                padding: 10px 15px;
+            }
+            .control-buttons {
+                flex-direction: column; /* Stack buttons vertically on small screens */
+            }
+            .lesson-button {
+                font-size: 1.2rem;
+                padding: 12px 20px;
+            }
+            .inline-speak-button {
+                font-size: 0.8rem; /* Smaller font on small screens */
+                padding: 6px 12px;
+            }
+        }
+
+        /* Fireworks Canvas Styles */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allows clicks to pass through to elements below */
+            z-index: 100; /* Ensure it's on top */
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-header">長頸鹿美語語詞大挑戰<br>Action Book 6</h1>
+
+        <!-- Home Screen -->
+        <div id="home-screen" class="home-screen">
+            <button class="lesson-button" data-lessons="1">Lesson 1</button>
+            <button class="lesson-button" data-lessons="2">Lesson 2</button>
+            <button class="lesson-button" data-lessons="3">Lesson 3</button>
+            <button class="lesson-button" data-lessons="4">Lesson 4</button>
+            <button class="lesson-button" data-lessons="5">Lesson 5</button>
+            <button class="lesson-button" data-lessons="6">Lesson 6</button>
+            <button class="lesson-button" data-lessons="7">Lesson 7</button>
+            <button class="lesson-button" data-lessons="8">Lesson 8</button>
+            <button class="lesson-button" data-lessons="9">Lesson 9</button>
+            <button class="lesson-button" data-lessons="11">Lesson 11</button>
+            <button class="lesson-button" data-lessons="12">Lesson 12</button>
+            <button class="lesson-button" data-lessons="13">Lesson 13</button>
+            <button class="lesson-button" data-lessons="14">Lesson 14</button>
+            <button class="lesson-button" data-lessons="15">Lesson 15</button>
+            <button class="lesson-button" data-lessons="16">Lesson 16</button>
+            <button class="lesson-button" data-lessons="17">Lesson 17</button>
+            <button class="lesson-button" data-lessons="18">Lesson 18</button>
+            <button class="lesson-button" data-lessons="19">Lesson 19</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-screen">
+            <div class="question-info">
+                <span id="lesson-display"></span>
+                <span id="question-count-display"></span>
+            </div>
+            <div class="question-box">
+                <div id="question-text" class="question-prompt">請輸入單字或片語：</div>
+                <div class="example-container">
+                    <span id="english-sentence" class="example-sentence-english"></span>
+                    <button id="inline-speak-button" class="inline-speak-button">
+                        重聽
+                    </button>
+                </div>
+                <div id="chinese-sentence" class="example-sentence-chinese"></div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="answer-input" class="answer-input" placeholder="請輸入單字或片語">
+                <div class="control-buttons">
+                    <button id="check-button" class="game-button primary">檢查答案</button>
+                    <button id="next-button" class="game-button tertiary" style="display: none;">下一題</button>
+                    <button id="back-to-home-button" class="game-button danger">回到首頁</button>
+                </div>
+            </div>
+
+            <div id="message-box" class="message-box"></div>
+            <div id="score-display" class="score-display">分數: 0 / 0</div>
+        </div>
+    </div>
+
+    <!-- Fireworks Canvas -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <script>
+        // Updated game data with all lessons from the provided JPG images.
+        const gameData = [
+            // From IMAG0051.jpg
+            // Lesson 1
+            { word: "twenty-five", sentence: "There are ___ pieces here.", chineseSentence: "這裡有二十五片。", correctAnswer: "twenty-five", chineseExplanation: "數字：二十五", lesson: 1 },
+            { word: "of course", sentence: "A: Would you like to help me finish the puzzle? B: ___!", chineseSentence: "A: 你願意幫我完成拼圖嗎？B: 當然！", correctAnswer: "Of course", chineseExplanation: "表達同意：當然", lesson: 1 },
+            // Lesson 2
+            { word: "mugs", sentence: "How many ___ do you count?", chineseSentence: "你數到多少個馬克杯？", correctAnswer: "mugs", chineseExplanation: "馬克杯 (複數)", lesson: 2 },
+            { word: "mug", sentence: "This ___ is my favorite.", chineseSentence: "這個馬克杯是我最喜歡的。", correctAnswer: "mug", chineseExplanation: "馬克杯 (單數)", lesson: 2 },
+            { word: "singular", sentence: "The ___ of 'mugs' is 'mug'.", chineseSentence: "'mugs'的單數形式是'mug'。", correctAnswer: "singular", chineseExplanation: "單數", lesson: 2 },
+            { word: "plural", sentence: "The ___ of 'mug' is 'mugs'.", chineseSentence: "'mug'的複數形式是'mugs'。", correctAnswer: "plural", chineseExplanation: "複數", lesson: 2 },
+            // Lesson 3
+            { word: "children", sentence: "There are fifteen ___ in the picture.", chineseSentence: "圖片中有十五個小孩。", correctAnswer: "children", chineseExplanation: "小孩 (複數)", lesson: 3 },
+            { word: "mice", sentence: "There are two ___ in the box.", chineseSentence: "盒子裡有兩隻老鼠。", correctAnswer: "mice", chineseExplanation: "老鼠 (複數)", lesson: 3 },
+            { word: "knives", sentence: "He is holding two ___.", chineseSentence: "他拿著兩把刀子。", correctAnswer: "knives", chineseExplanation: "刀子 (複數)", lesson: 3 },
+            { word: "child", sentence: "The ___ is playing outside.", chineseSentence: "那個小孩在外面玩。", correctAnswer: "child", chineseExplanation: "小孩 (單數)", lesson: 3 },
+            { word: "mouse", sentence: "I saw a ___ in the kitchen.", chineseSentence: "我在廚房看到一隻老鼠。", correctAnswer: "mouse", chineseExplanation: "老鼠 (單數)", lesson: 3 },
+            { word: "knife", sentence: "Please pass me the ___.", chineseSentence: "請遞給我那把刀子。", correctAnswer: "knife", chineseExplanation: "刀子 (單數)", lesson: 3 },
+            // Lesson 4
+            { word: "taste", sentence: "How does the steak ___?", chineseSentence: "這塊牛排嚐起來怎麼樣？", correctAnswer: "taste", chineseExplanation: "品嚐", lesson: 4 },
+            { word: "wonderful", sentence: "It tastes ___.", chineseSentence: "它嚐起來很棒。", correctAnswer: "wonderful", chineseExplanation: "很棒的", lesson: 4 },
+            { word: "smell", sentence: "How does the steak ___?", chineseSentence: "這塊牛排聞起來怎麼樣？", correctAnswer: "smell", chineseExplanation: "聞起來", lesson: 4 },
+            { word: "smells", sentence: "It ___ great.", chineseSentence: "它聞起來很棒。", correctAnswer: "smells", chineseExplanation: "聞起來", lesson: 4 },
+            // Lesson 5
+            { word: "cake", sentence: "The ___ tastes really sweet.", chineseSentence: "這個蛋糕嚐起來真的很甜。", correctAnswer: "cake", chineseExplanation: "蛋糕", lesson: 5 },
+            { word: "sweet", sentence: "The cake tastes really ___.", chineseSentence: "這個蛋糕嚐起來真的很甜。", correctAnswer: "sweet", chineseExplanation: "甜的", lesson: 5 },
+            { word: "like it, too", sentence: "A: I like it. B1: I ___.", chineseSentence: "A: 我喜歡它。B1: 我也喜歡。", correctAnswer: "like it, too", chineseExplanation: "我也喜歡", lesson: 5 },
+            { word: "don't like it, either", sentence: "A: I don't like it. B2: I ___.", chineseSentence: "A: 我不喜歡它。B2: 我也不喜歡。", correctAnswer: "don't like it, either", chineseExplanation: "不喜歡，也不", lesson: 5 },
+            // Lesson 6
+            { word: "hamburger", sentence: "Andy likes the ___ because it smells great.", chineseSentence: "Andy喜歡這個漢堡，因為它聞起來很棒。", correctAnswer: "hamburger", chineseExplanation: "漢堡", lesson: 6 },
+            { word: "hamburgers", sentence: "Andy likes the ___ because they smell great.", chineseSentence: "Andy喜歡這些漢堡，因為它們聞起來很棒。", correctAnswer: "hamburgers", chineseExplanation: "漢堡 (複數)", lesson: 6 },
+
+            // From IMAG0052.jpg & IMAG0053.jpg
+            // Lesson 7
+            { word: "learn", sentence: "I hope I can ___ computer science well.", chineseSentence: "我希望我能學好電腦科學。", correctAnswer: "learn", chineseExplanation: "學習", lesson: 7 },
+            { word: "basketball player", sentence: "I want to be a ___.", chineseSentence: "我想成為一名籃球運動員。", correctAnswer: "basketball player", chineseExplanation: "籃球運動員", lesson: 7 },
+            { word: "engineer", sentence: "I want to be an ___.", chineseSentence: "我想成為一名工程師。", correctAnswer: "engineer", chineseExplanation: "工程師", lesson: 7 },
+            // Lesson 8
+            { word: "dizzy", sentence: "Andy must feel ___.", chineseSentence: "Andy一定覺得頭暈。", correctAnswer: "dizzy", chineseExplanation: "頭暈的", lesson: 8 },
+            { word: "take a rest", sentence: "I think he needs to ___.", chineseSentence: "我想他需要休息一下。", correctAnswer: "take a rest", chineseExplanation: "休息", lesson: 8 },
+            // Lesson 9
+            { word: "dresses", sentence: "I know Lisa likes ___.", chineseSentence: "我知道Lisa喜歡洋裝。", correctAnswer: "dresses", chineseExplanation: "洋裝", lesson: 9 },
+            { word: "go shopping", sentence: "I know Lisa likes to ___.", chineseSentence: "我知道Lisa喜歡逛街。", correctAnswer: "go shopping", chineseExplanation: "去購物", lesson: 9 },
+            // Lesson 11
+            { word: "feels", sentence: "Everybody ___ great in spring.", chineseSentence: "每個人在春天都感覺很好。", correctAnswer: "feels", chineseExplanation: "感覺", lesson: 11 },
+            { word: "dog", sentence: "Everybody likes the cute ___.", chineseSentence: "每個人都喜歡那隻可愛的狗。", correctAnswer: "dog", chineseExplanation: "狗", lesson: 11 },
+            { word: "food", sentence: "Everybody loves the ___ here.", chineseSentence: "每個人都喜歡這裡的食物。", correctAnswer: "food", chineseExplanation: "食物", lesson: 11 },
+            { word: "go camping", sentence: "Everybody wants to ___.", chineseSentence: "每個人都想去露營。", correctAnswer: "go camping", chineseExplanation: "去露營", lesson: 11 },
+            { word: "in spring", sentence: "I go camping with my family ___.", chineseSentence: "我春天和我家人一起去露營。", correctAnswer: "in spring", chineseExplanation: "在春天", lesson: 11 },
+            // Lesson 12
+            { word: "season", sentence: "What's your favorite ___?", chineseSentence: "你最喜歡的季節是什麼？", correctAnswer: "season", chineseExplanation: "季節", lesson: 12 },
+            { word: "Fall", sentence: "___ is my favorite season because I can go hiking with my family.", chineseSentence: "秋天是我最喜歡的季節，因為我可以和家人一起去健行。", correctAnswer: "Fall", chineseExplanation: "秋天", lesson: 12 },
+            { word: "hiking", sentence: "I can go ___ with my family.", chineseSentence: "我可以和我的家人一起去健行。", correctAnswer: "hiking", chineseExplanation: "健行", lesson: 12 },
+            { word: "fall", sentence: "My favorite season is ___.", chineseSentence: "我最喜歡的季節是秋天。", correctAnswer: "fall", chineseExplanation: "秋天", lesson: 12 },
+            // Lesson 13
+            { word: "becomes warm", sentence: "In spring, the weather ___.", chineseSentence: "在春天，天氣變暖。", correctAnswer: "becomes warm", chineseExplanation: "變暖", lesson: 13 },
+            { word: "cool", sentence: "In fall, it's ___ and I like to go roller-skating.", chineseSentence: "在秋天，天氣很涼爽，我喜歡去溜直排輪。", correctAnswer: "cool", chineseExplanation: "涼爽的", lesson: 13 },
+            { word: "go roller-skating", sentence: "I like to ___.", chineseSentence: "我喜歡去溜直排輪。", correctAnswer: "go roller-skating", chineseExplanation: "去溜直排輪", lesson: 13 },
+            // Lesson 14
+            { word: "after", sentence: "What season comes ___ spring?", chineseSentence: "春天之後是什麼季節？", correctAnswer: "after", chineseExplanation: "在……之後", lesson: 14 },
+            { word: "summer", sentence: "It's ___.", chineseSentence: "是夏天。", correctAnswer: "summer", chineseExplanation: "夏天", lesson: 14 },
+            { word: "wearing sandals", sentence: "We can see a lot of people ___.", chineseSentence: "我們可以看到很多人穿涼鞋。", correctAnswer: "wearing sandals", chineseExplanation: "穿涼鞋", lesson: 14 },
+            // Lesson 15
+            { word: "butterflies flying", sentence: "We can see ___.", chineseSentence: "我們可以看到蝴蝶在飛。", correctAnswer: "butterflies flying", chineseExplanation: "蝴蝶在飛", lesson: 15 },
+            { word: "people laughing", sentence: "We can hear ___.", chineseSentence: "我們可以聽到人們在笑。", correctAnswer: "people laughing", chineseExplanation: "人們在笑", lesson: 15 },
+            { word: "bookstore", sentence: "I want to go to the ___ after school.", chineseSentence: "放學後我想去書店。", correctAnswer: "bookstore", chineseExplanation: "書店", lesson: 15 },
+            { word: "before dinner", sentence: "I need to go home ___.", chineseSentence: "我需要在晚餐前回家。", correctAnswer: "before dinner", chineseExplanation: "在晚餐前", lesson: 15 },
+            // Lesson 16
+            { word: "before", sentence: "___ school, I have breakfast.", chineseSentence: "上學前，我吃早餐。", correctAnswer: "Before", chineseExplanation: "在……之前", lesson: 16 },
+            { word: "after", sentence: "___ school, I have dinner.", chineseSentence: "放學後，我吃晚餐。", correctAnswer: "After", chineseExplanation: "在……之後", lesson: 16 },
+            // Lesson 17
+            { word: "go to work", sentence: "How do you ___ every day?", chineseSentence: "你每天怎麼去上班？", correctAnswer: "go to work", chineseExplanation: "去上班", lesson: 17 },
+            { word: "scooter", sentence: "I go to work by ___.", chineseSentence: "我騎機車去上班。", correctAnswer: "scooter", chineseExplanation: "機車", lesson: 17 },
+            { word: "dangerous", sentence: "It's so ___.", chineseSentence: "這太危險了。", correctAnswer: "dangerous", chineseExplanation: "危險的", lesson: 17 },
+            { word: "a little dangerous", sentence: "It's ___.", chineseSentence: "這有點危險。", correctAnswer: "a little dangerous", chineseExplanation: "有點危險", lesson: 17 },
+            // Lesson 18
+            { word: "get to", sentence: "How can we ___ ABC Restaurant?", chineseSentence: "我們怎麼去ABC餐廳？", correctAnswer: "get to", chineseExplanation: "到達", lesson: 18 },
+            { word: "get there", sentence: "How can we ___?", chineseSentence: "我們怎麼去那裡？", correctAnswer: "get there", chineseExplanation: "到達那裡", lesson: 18 },
+            { word: "by subway", sentence: "We can get there ___.", chineseSentence: "我們可以搭捷運去那裡。", correctAnswer: "by subway", chineseExplanation: "搭捷運", lesson: 18 },
+            { word: "on foot", sentence: "We can get there ___.", chineseSentence: "我們可以走路去那裡。", correctAnswer: "on foot", chineseExplanation: "走路", lesson: 18 },
+            // Lesson 19
+            { word: "ride his motorcycle", sentence: "John likes to ___ to get there.", chineseSentence: "John喜歡騎他的機車去那裡。", correctAnswer: "ride his motorcycle", chineseExplanation: "騎他的機車", lesson: 19 },
+            { word: "drive her car", sentence: "Ms. Blake wants to ___ to get there.", chineseSentence: "Blake女士想開她的車去那裡。", correctAnswer: "drive her car", chineseExplanation: "開她的車", lesson: 19 },
+            { word: "take the bus", sentence: "Sarah likes to ___ to get there.", chineseSentence: "Sarah喜歡搭公車去那裡。", correctAnswer: "take the bus", chineseExplanation: "搭公車", lesson: 19 },
+            { word: "walk", sentence: "Mrs. Smith wants to ___ there.", chineseSentence: "Smith太太想走路去那裡。", correctAnswer: "walk", chineseExplanation: "走路", lesson: 19 },
+        ];
+
+        // List of encouraging phrases for correct answers
+        const encouragingPhrases = [
+            "太厲害了，再接再厲！",
+            "你真是答題高手！",
+            "完全正確，太強了！",
+            "恭喜你，又答對了！",
+            "真是聰明絕頂！",
+            "超乎想像，讚！",
+            "無人能敵，厲害！",
+            "答得太漂亮了！",
+            "你是最棒的！",
+            "輕鬆過關，強！",
+            "天才就是你！",
+            "實力派玩家！",
+            "厲害，佩服！",
+            "簡直神準！",
+            "又對了，漂亮！",
+            "這題難不倒你！",
+            "表現超讚！",
+            "你真是專家！",
+            "答案完美！",
+            "再來一題！"
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalQuestions = 0;
+        let shuffledGameData = [];
+        let isAwaitingCorrectReentry = false; // New flag to track if we're waiting for correct re-entry
+
+        // DOM elements
+        const homeScreen = document.getElementById('home-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const lessonButtons = document.querySelectorAll('.lesson-button');
+        const questionTextElement = document.getElementById('question-text');
+        const englishSentenceElement = document.getElementById('english-sentence');
+        const chineseSentenceElement = document.getElementById('chinese-sentence');
+        const inlineSpeakButton = document.getElementById('inline-speak-button');
+        const answerInput = document.getElementById('answer-input');
+        const checkButton = document.getElementById('check-button');
+        const nextButton = document.getElementById('next-button');
+        const backToHomeButton = document.getElementById('back-to-home-button');
+        const messageBox = document.getElementById('message-box');
+        const scoreDisplay = document.getElementById('score-display'); 
+        const lessonDisplay = document.getElementById('lesson-display');
+        const questionCountDisplay = document.getElementById('question-count-display');
+
+        // Audio context for sound effects
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Fireworks canvas elements
+        const fireworksCanvas = document.getElementById('fireworks-canvas');
+        const ctx = fireworksCanvas.getContext('2d');
+        let particles = [];
+        let animationFrameId;
+
+        // Resize canvas to fill parent container
+        function resizeCanvas() {
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+        }
+
+        // Particle class for fireworks
+        class Particle {
+            constructor(x, y, color, velocityX, velocityY) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2 + 1;
+                this.velocityX = velocityX;
+                this.velocityY = velocityY;
+                this.alpha = 1;
+                this.friction = 0.99;
+                this.gravity = 0.05;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocityX *= this.friction;
+                this.velocityY *= this.friction;
+                this.velocityY += this.gravity;
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                this.alpha -= 0.01;
+            }
+        }
+
+        // Create a single firework burst
+        function createFirework(x, y, color) {
+            const particleCount = 50;
+            const angleIncrement = Math.PI * 2 / particleCount;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = angleIncrement * i;
+                const speed = Math.random() * 5 + 3;
+                const velocityX = Math.cos(angle) * speed;
+                const velocityY = Math.sin(angle) * speed;
+                particles.push(new Particle(x, y, color, velocityX, velocityY));
+            }
+        }
+
+        // Animation loop for fireworks
+        function animateFireworks() {
+            animationFrameId = requestAnimationFrame(animateFireworks);
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                particle.update();
+                particle.draw();
+
+                if (particle.alpha <= 0 || particle.radius < 0.5) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            if (particles.length === 0) {
+               cancelAnimationFrame(animationFrameId);
+            }
+        }
+
+        // Trigger fireworks
+        function triggerFireworks() {
+            if (animationFrameId) {
+               cancelAnimationFrame(animationFrameId);
+            }
+            particles = [];
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            setTimeout(() => createFirework(centerX - 150, centerY + 50, 'rgba(255, 100, 100, 1)'), 0);
+            setTimeout(() => createFirework(centerX, centerY - 100, 'rgba(100, 255, 100, 1)'), 200);
+            setTimeout(() => createFirework(centerX + 150, centerY + 20, 'rgba(100, 100, 255, 1)'), 400);
+
+            animateFireworks();
+        }
+
+        /**
+         * Plays a simple tone sound effect.
+         */
+        function playTone(frequency, duration, type = 'sine') {
+            if (!audioContext) return;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+           gainNode.connect(audioContext.destination);
+
+            oscillator.type = type;
+           oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+           gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+
+            oscillator.start();
+           oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        /**
+         * Plays a success sound that mimics applause/cheering.
+         */
+        function playSuccessSound() {
+            playTone(660, 0.08, 'sine');
+            setTimeout(() => playTone(784, 0.08, 'sine'), 90);
+            setTimeout(() => playTone(988, 0.1, 'sine'), 180);
+            setTimeout(() => playTone(1320, 0.15, 'sine'), 300);
+        }
+
+        /**
+         * Plays a failure sound (more pleasant).
+         */
+        function playFailureSound() {
+            playTone(392, 0.15, 'triangle');
+            setTimeout(() => playTone(330, 0.15, 'triangle'), 100);
+        }
+
+        /**
+         * Shuffles an array using the Fisher-Yates algorithm.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /**
+         * Displays the current question.
+         */
+        function displayQuestion() {
+            if (currentQuestionIndex >= shuffledGameData.length) {
+                endGame();
+                return;
+            }
+
+            const currentItem = shuffledGameData[currentQuestionIndex];
+            questionTextElement.textContent = `請輸入單字或片語：`;
+            englishSentenceElement.textContent = currentItem.sentence;
+            chineseSentenceElement.textContent = `(${currentItem.chineseSentence})`;
+            answerInput.value = '';
+            answerInput.focus();
+            hideMessage();
+            updateScoreDisplay();
+
+            lessonDisplay.textContent = `第 ${currentItem.lesson} 課`;
+            questionCountDisplay.textContent = `目前第 ${currentQuestionIndex + 1} 題 / 共 ${totalQuestions} 題`;
+
+            checkButton.style.display = 'inline-block';
+            nextButton.style.display = 'none';
+            answerInput.disabled = false;
+            isAwaitingCorrectReentry = false;
+            nextButton.textContent = '下一題';
+
+            inlineSpeakButton.style.display = 'inline-block';
+        }
+
+        /**
+         * Speaks the vocabulary word and its example sentence using Web Speech API.
+         */
+        function speakWordAndSentence() {
+            window.speechSynthesis.cancel();
+            const currentItem = shuffledGameData[currentQuestionIndex];
+            const wordToSpeak = currentItem.word;
+            const sentenceToSpeak = currentItem.sentence.replace('___', currentItem.correctAnswer);
+
+            const utteranceWord = new SpeechSynthesisUtterance(wordToSpeak);
+            utteranceWord.lang = 'en-US';
+            utteranceWord.rate = 0.8;
+            utteranceWord.pitch = 1.0;
+
+            utteranceWord.onend = () => {
+                const utteranceSentence = new SpeechSynthesisUtterance(sentenceToSpeak);
+                utteranceSentence.lang = 'en-US';
+                utteranceSentence.rate = 0.8;
+                utteranceSentence.pitch = 1.0;
+                window.speechSynthesis.speak(utteranceSentence);
+            };
+
+            window.speechSynthesis.speak(utteranceWord);
+        }
+
+        /**
+         * Checks the user's answer against the correct answer.
+         */
+        function checkAnswer() {
+            window.speechSynthesis.cancel();
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const currentItem = shuffledGameData[currentQuestionIndex];
+            const correctAnswer = currentItem.correctAnswer.toLowerCase();
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                const randomIndex = Math.floor(Math.random() * encouragingPhrases.length);
+                showMessage(encouragingPhrases[randomIndex], 'correct');
+                playSuccessSound();
+                triggerFireworks();
+                answerInput.disabled = true;
+                checkButton.style.display = 'none';
+                nextButton.style.display = 'inline-block';
+                isAwaitingCorrectReentry = false;
+                nextButton.textContent = '下一題';
+            } else {
+                let message = `錯誤！正確答案是: "${currentItem.correctAnswer}"`;
+                if (currentItem.chineseExplanation) {
+                    message += `<br>解析: ${currentItem.chineseExplanation}`;
+                }
+                showMessage(message, 'incorrect');
+                playFailureSound();
+                answerInput.value = '';
+                answerInput.placeholder = '請再次輸入正確答案以繼續';
+                answerInput.disabled = false;
+                checkButton.style.display = 'none';
+                nextButton.style.display = 'inline-block';
+                isAwaitingCorrectReentry = true;
+                nextButton.textContent = '確認並下一題';
+            }
+            updateScoreDisplay();
+        }
+
+        /**
+         * Moves to the next question in the shuffled game data.
+         */
+        function nextQuestion() {
+            window.speechSynthesis.cancel();
+            const currentItem = shuffledGameData[currentQuestionIndex];
+            const correctAnswer = currentItem.correctAnswer.toLowerCase();
+
+            if (isAwaitingCorrectReentry) {
+                const reEnteredAnswer = answerInput.value.trim().toLowerCase();
+                if (reEnteredAnswer === correctAnswer) {
+                    isAwaitingCorrectReentry = false;
+                    answerInput.placeholder = '請輸入單字或片語';
+                    answerInput.disabled = true;
+                    checkButton.style.display = 'none';
+                    nextButton.style.display = 'inline-block';
+                    hideMessage();
+                } else {
+                    showMessage(`請務必輸入正確答案 "${currentItem.correctAnswer}" 才能進入下一題。`, 'incorrect');
+                    answerInput.value = '';
+                    answerInput.focus();
+                    return;
+                }
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= shuffledGameData.length) {
+                endGame();
+                return;
+            }
+
+            isAwaitingCorrectReentry = false;
+            answerInput.placeholder = '請輸入單字或片語';
+            displayQuestion();
+            speakWordAndSentence();
+        }
+
+        /**
+         * Displays a message to the user in the message box.
+         */
+        function showMessage(message, type) {
+            messageBox.innerHTML = message;
+            messageBox.className = `message-box ${type}`;
+            messageBox.style.display = 'block';
+        }
+
+        /**
+         * Hides the message box.
+         */
+        function hideMessage() {
+            messageBox.style.display = 'none';
+            messageBox.className = 'message-box';
+        }
+
+        /**
+         * Updates the score displayed on the screen.
+         */
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `分數: ${score} / ${totalQuestions}`;
+        }
+
+        /**
+         * Ends the game, displays the final score, and shows relevant buttons.
+         */
+        function endGame() {
+            window.speechSynthesis.cancel();
+            questionTextElement.textContent = '遊戲結束！';
+            let finalScorePercentage = 0;
+            if (totalQuestions > 0) {
+                finalScorePercentage = Math.round((score / totalQuestions) * 100);
+            }
+            englishSentenceElement.textContent = `你的最終分數是: ${finalScorePercentage} 分`;
+            chineseSentenceElement.textContent = '';
+            answerInput.style.display = 'none';
+            checkButton.style.display = 'none';
+            nextButton.style.display = 'none';
+            backToHomeButton.style.display = 'inline-block';
+            inlineSpeakButton.style.display = 'none';
+            lessonDisplay.textContent = '';
+            questionCountDisplay.textContent = '';
+            hideMessage();
+        }
+
+        /**
+         * Shows the home screen and resets the game state for a new game.
+         */
+        function showHomeScreen() {
+            window.speechSynthesis.cancel();
+            homeScreen.style.display = 'grid';
+            gameScreen.style.display = 'none';
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledGameData = [];
+            particles = [];
+            cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+            answerInput.style.display = 'block';
+            inlineSpeakButton.style.display = 'none';
+        }
+
+        /**
+         * Starts the game by filtering questions based on the selected lesson.
+         */
+        function startGame(lessonIdentifier) {
+            const lessonNum = Number(lessonIdentifier);
+            const filteredData = gameData.filter(item => item.lesson === lessonNum);
+            
+            if (filteredData.length === 0) {
+                showMessage('此範圍內沒有可用的題目。請選擇其他範圍。', 'incorrect');
+                setTimeout(() => {
+                    hideMessage();
+                    showHomeScreen();
+                }, 2000);
+                return;
+            }
+
+            shuffledGameData = shuffleArray([...filteredData]);
+            totalQuestions = filteredData.length;
+
+            homeScreen.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            displayQuestion();
+            speakWordAndSentence();
+        }
+
+        // Event Listeners
+        lessonButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const lessons = button.dataset.lessons;
+                startGame(lessons);
+            });
+        });
+
+        inlineSpeakButton.addEventListener('click', speakWordAndSentence);
+        checkButton.addEventListener('click', checkAnswer);
+        nextButton.addEventListener('click', nextQuestion);
+        backToHomeButton.addEventListener('click', showHomeScreen);
+
+        // Event listener for Enter key press on the answer input field
+        answerInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                if (isAwaitingCorrectReentry) {
+                    nextQuestion();
+                } else if (!answerInput.disabled) {
+                    checkAnswer();
+                } else if (nextButton.style.display !== 'none') {
+                    nextQuestion();
+                }
+            }
+        });
+
+        // Initialize the game when the window loads
+        window.onload = () => {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            showHomeScreen();
+        };
+    </script>
+</body>
+</html>
